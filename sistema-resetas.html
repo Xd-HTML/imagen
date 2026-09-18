@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador y Editor de Menú de Restaurante</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Great+Vibes&family=Oswald:wght@500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Custom Fonts */
+        .font-title { font-family: 'Cinzel', serif; }
+        .font-menu-header { font-family: 'Oswald', sans-serif; }
+        .font-script { font-family: 'Great Vibes', cursive; }
+        .font-body { font-family: 'Poppins', sans-serif; }
+
+        /* Menu Theme Backgrounds */
+        .bg-burgundy-gold {
+            background: radial-gradient(circle at center, #5c141d 0%, #380a10 70%, #200407 100%);
+        }
+
+        /* Wooden Sign Aesthetic */
+        .wood-texture {
+            background: linear-gradient(180deg, #8B4513 0%, #5C2E0B 50%, #3D1E07 100%);
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.8), 0 8px 15px rgba(0,0,0,0.5);
+            border: 3px solid #d4af37;
+        }
+
+        /* Ornate Gold Border Frame */
+        .menu-border-frame {
+            border: 3px solid #d4af37;
+            outline: 2px solid #5c141d;
+            outline-offset: -8px;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.7);
+        }
+
+        /* Dotted Leader Line for Prices */
+        .dotted-line {
+            flex-grow: 1;
+            border-bottom: 3px dotted #d4af37;
+            margin: 0 8px;
+            height: 1.2em;
+            opacity: 0.8;
+        }
+
+        /* Golden Text Gradient Effects */
+        .text-gold-gradient {
+            background: linear-gradient(180deg, #FFF6BD 0%, #F3CA52 50%, #C70039 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+        }
+
+        .text-gold-solid {
+            color: #F3CA52;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.9);
+        }
+
+        /* Frame for Food Images */
+        .image-frame {
+            border: 3px solid #d4af37;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.6);
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .image-frame:hover {
+            transform: scale(1.02);
+        }
+
+        /* Print Optimization */
+        @media print {
+            body { background: white !important; }
+            .no-print { display: none !important; }
+            .print-area {
+                box-shadow: none !important;
+                border: none !important;
+                padding: 0 !important;
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+            .page-break {
+                page-break-after: always;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100 font-body min-h-screen flex flex-col">
+
+    <!-- Top Action Bar (Editable Controls) -->
+    <header class="no-print bg-gray-800 border-b border-gray-700 sticky top-0 z-50 shadow-xl">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="bg-amber-600 text-white p-2 rounded-lg">
+                    <i class="fa-solid fa-utensils text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight text-amber-400">Editor de Menú Interactivo</h1>
+                    <p class="text-xs text-gray-400">Diseño inspirativo en pergamino borgoña</p>
+                </div>
+            </div>
+
+            <!-- Tab Switcher -->
+            <div class="flex items-center bg-gray-900 p-1 rounded-xl border border-gray-700">
+                <button onclick="switchTab('platos')" id="tab-btn-platos" class="tab-btn px-4 py-2 text-sm font-semibold rounded-lg transition-all bg-amber-600 text-white shadow">
+                    <i class="fa-solid fa-drumstick-bite mr-2"></i>Platos a la Carta
+                </button>
+                <button onclick="switchTab('entradas')" id="tab-btn-entradas" class="tab-btn px-4 py-2 text-sm font-semibold rounded-lg text-gray-300 hover:text-white transition-all">
+                    <i class="fa-solid fa-bowl-food mr-2"></i>Entradas
+                </button>
+                <button onclick="switchTab('bebidas')" id="tab-btn-bebidas" class="tab-btn px-4 py-2 text-sm font-semibold rounded-lg text-gray-300 hover:text-white transition-all">
+                    <i class="fa-solid fa-glass-water mr-2"></i>Bebidas
+                </button>
+            </div>
+
+            <!-- Controls (Toggle Mode & Print) -->
+            <div class="flex items-center space-x-2">
+                <button onclick="toggleEditMode()" id="edit-toggle-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center shadow transition">
+                    <i class="fa-solid fa-pen-to-square mr-2"></i><span id="edit-toggle-text">Modo Edición: ACTIVADO</span>
+                </button>
+                <button onclick="window.print()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center shadow transition">
+                    <i class="fa-solid fa-print mr-2"></i>Imprimir / PDF
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow p-4 md:p-8 flex justify-center items-start overflow-y-auto">
+        
+        <!-- Menu Canvas Frame -->
+        <div id="menu-canvas" class="print-area w-full max-w-4xl bg-burgundy-gold text-white rounded-2xl p-6 sm:p-10 menu-border-frame relative shadow-2xl transition-all">
+            
+            <!-- Ornate Corner Accents -->
+            <div class="absolute top-3 left-3 text-amber-400 text-3xl pointer-events-none opacity-80">❖</div>
+            <div class="absolute top-3 right-3 text-amber-400 text-3xl pointer-events-none opacity-80">❖</div>
+            <div class="absolute bottom-3 left-3 text-amber-400 text-3xl pointer-events-none opacity-80">❖</div>
+            <div class="absolute bottom-3 right-3 text-amber-400 text-3xl pointer-events-none opacity-80">❖</div>
+
+            <!-- Header Section (Logo / Wooden Sign) -->
+            <div class="text-center mb-8 relative">
+                
+                <!-- Wooden Sign Box -->
+                <div class="wood-texture max-w-xl mx-auto rounded-2xl p-4 sm:p-6 text-center relative overflow-hidden group">
+                    
+                    <!-- Chain Hooks Effect -->
+                    <div class="absolute -top-1 left-1/4 w-3 h-4 bg-amber-700 rounded-b border border-yellow-900 shadow"></div>
+                    <div class="absolute -top-1 right-1/4 w-3 h-4 bg-amber-700 rounded-b border border-yellow-900 shadow"></div>
+
+                    <!-- Logo Upload / Display Slot -->
+                    <div class="mb-2 flex flex-col items-center justify-center">
+                        <div class="relative group/logo">
+                            <img id="logo-preview" src="https://placehold.co/120x120/5c2e0b/f3ca52?text=LOGO" alt="Logo Restaurante" class="w-20 h-20 object-cover rounded-full border-2 border-amber-400 shadow-md">
+                            
+                            <!-- Edit Button for Logo (Visible in edit mode) -->
+                            <label for="logo-input" class="edit-control absolute inset-0 bg-black/60 rounded-full flex items-center justify-center cursor-pointer opacity-0 group-hover/logo:opacity-100 transition">
+                                <i class="fa-solid fa-camera text-amber-300 text-lg"></i>
+                                <input type="file" id="logo-input" accept="image/*" class="hidden" onchange="handleLogoUpload(event)">
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Editable Restaurant Name -->
+                    <div class="relative my-1">
+                        <span class="text-xs uppercase tracking-widest text-amber-200 block font-semibold">Restaurante</span>
+                        <input type="text" id="rest-name-input" value="La Esquina del Buen Sabor" 
+                            class="editable-field bg-transparent text-center font-title text-2xl sm:text-4xl font-black text-white w-full border-b border-transparent hover:border-amber-400 focus:border-amber-400 focus:bg-black/30 outline-none rounded px-2 transition">
+                    </div>
+
+                    <!-- Editable Tagline -->
+                    <div class="mt-2 inline-block bg-amber-950/80 px-4 py-1 rounded-full border border-amber-600/50">
+                        <input type="text" id="rest-tagline-input" value="Comida casera • Sabor auténtico" 
+                            class="editable-field bg-transparent text-center text-xs sm:text-sm font-medium text-amber-200 w-full border-b border-transparent hover:border-amber-400 focus:border-amber-400 outline-none rounded transition">
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION TITLE -->
+            <div class="text-center my-6 flex items-center justify-center space-x-3">
+                <span class="text-amber-400 text-xl font-bold">❖</span>
+                <input type="text" id="section-title-input" value="PLATOS A LA CARTA" 
+                    class="editable-field text-center font-menu-header text-3xl sm:text-5xl font-black tracking-wider text-amber-400 bg-transparent border-b-2 border-transparent hover:border-amber-400 focus:border-amber-400 focus:bg-black/20 outline-none uppercase transition px-2">
+                <span class="text-amber-400 text-xl font-bold">❖</span>
+            </div>
+
+            <!-- Two-Column Layout: Left (Dishes & Prices), Right (3 Sample Images) -->
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-6 sm:gap-8 items-start my-6">
+                
+                <!-- LEFT COLUMN: Dish List (7 cols) -->
+                <div class="md:col-span-7 space-y-4">
+                    <div id="dishes-container" class="space-y-3">
+                        <!-- Dynamic items will be injected here via JS -->
+                    </div>
+
+                    <!-- Add New Dish Button (+) -->
+                    <div class="edit-control pt-2">
+                        <button onclick="addNewDish()" class="w-full py-3 border-2 border-dashed border-amber-500/60 hover:border-amber-400 bg-amber-900/20 hover:bg-amber-900/40 text-amber-300 rounded-xl font-semibold flex items-center justify-center space-x-2 transition shadow group">
+                            <span class="bg-amber-500 text-gray-900 w-7 h-7 rounded-full flex items-center justify-center text-lg font-bold group-hover:scale-110 transition">+</span>
+                            <span>Agregar Nuevo Plato / Producto</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- RIGHT COLUMN: 3 Example Dish Images Stack (5 cols) -->
+                <div class="md:col-span-5 flex flex-col space-y-4 items-center justify-center">
+                    <p class="text-xs text-amber-300 font-semibold uppercase tracking-wider text-center edit-control">
+                        <i class="fa-solid fa-images mr-1"></i>Fotos de Ejemplo (3 slots)
+                    </p>
+                    
+                    <div id="images-container" class="w-full space-y-4">
+                        <!-- 3 Image slots rendered dynamically -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Message ("¡Buen Provecho!") -->
+            <div class="mt-10 pt-6 border-t border-amber-500/30 text-center relative">
+                <div class="inline-block relative">
+                    <span class="absolute -top-3 -left-6 text-amber-400 text-lg opacity-70">✦</span>
+                    <input type="text" id="footer-msg-input" value="¡Buen Provecho!" 
+                        class="editable-field font-script text-4xl sm:text-6xl text-amber-300 text-center bg-transparent border-b border-transparent hover:border-amber-400 focus:border-amber-400 focus:bg-black/20 outline-none transition px-4">
+                    <span class="absolute -bottom-1 -right-6 text-amber-400 text-lg opacity-70">✦</span>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // Global State for all 3 Sections
+        const menuData = {
+            restaurant: {
+                name: "La Esquina del Buen Sabor",
+                tagline: "Comida casera • Sabor auténtico",
+                logo: "https://placehold.co/120x120/5c2e0b/f3ca52?text=LOGO",
+                footerMsg: "¡Buen Provecho!"
+            },
+            currentTab: 'platos',
+            isEditMode: true,
+            sections: {
+                platos: {
+                    title: "PLATOS A LA CARTA",
+                    items: [
+                        { id: 1, name: "LOMITO SALTADO", price: "15.0" },
+                        { id: 2, name: "MILANESA", price: "15.0" },
+                        { id: 3, name: "CHULETA", price: "15.0" },
+                        { id: 4, name: "CHURRASCO", price: "15.0" },
+                        { id: 5, name: "PESCADO FRITO", price: "15.0" },
+                        { id: 6, name: "POLLO FRITO", price: "15.0" },
+                        { id: 7, name: "POLLO A LA PLANCHA", price: "15.0" }
+                    ],
+                    images: [
+                        "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=400&q=80",
+                        "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=400&q=80",
+                        "https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=400&q=80"
+                    ]
+                },
+                entradas: {
+                    title: "ENTRADAS TRADICIONALES",
+                    items: [
+                        { id: 101, name: "PAPA A LA HUANCAÍNA", price: "10.0" },
+                        { id: 102, name: "CAUSA RELLENA DE POLLO", price: "12.0" },
+                        { id: 103, name: "CEVICHE DE PESCADO", price: "18.0" },
+                        { id: 104, name: "SOPA SUSTANCIA DE CARNE", price: "10.0" },
+                        { id: 105, name: "TAMAL CRIOLLO", price: "8.0" }
+                    ],
+                    images: [
+                        "https://images.unsplash.com/photo-1535399831218-d5bd36d1a6b3?auto=format&fit=crop&w=400&q=80",
+                        "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=400&q=80",
+                        "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=400&q=80"
+                    ]
+                },
+                bebidas: {
+                    title: "BEBIDAS Y REFRESCOS",
+                    items: [
+                        { id: 201, name: "CHICHA MORADA (1 LITRO)", price: "10.0" },
+                        { id: 202, name: "MARACUYÁ REFRESCO (1 LITRO)", price: "10.0" },
+                        { id: 203, name: "LIMONADA FROZEN", price: "12.0" },
+                        { id: 204, name: "GASEOSA PERSONAL 500ML", price: "4.5" },
+                        { id: 205, name: "CERVEZA PERSONAL", price: "8.0" }
+                    ],
+                    images: [
+                        "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=400&q=80",
+                        "https://images.unsplash.com/photo-1556881286-fc6915169721?auto=format&fit=crop&w=400&q=80",
+                        "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&w=400&q=80"
+                    ]
+                }
+            }
+        };
+
+        // Initialize view on page load
+        window.onload = function() {
+            bindRestaurantHeaderEvents();
+            renderCurrentSection();
+        };
+
+        // Bind events for top restaurant fields
+        function bindRestaurantHeaderEvents() {
+            document.getElementById('rest-name-input').addEventListener('input', (e) => {
+                menuData.restaurant.name = e.target.value;
+            });
+            document.getElementById('rest-tagline-input').addEventListener('input', (e) => {
+                menuData.restaurant.tagline = e.target.value;
+            });
+            document.getElementById('section-title-input').addEventListener('input', (e) => {
+                menuData.sections[menuData.currentTab].title = e.target.value;
+            });
+            document.getElementById('footer-msg-input').addEventListener('input', (e) => {
+                menuData.restaurant.footerMsg = e.target.value;
+            });
+        }
+
+        // Switch active tab
+        function switchTab(tabKey) {
+            menuData.currentTab = tabKey;
+            
+            // Update tab styles
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-amber-600', 'text-white', 'shadow');
+                btn.classList.add('text-gray-300');
+            });
+            const activeBtn = document.getElementById(`tab-btn-${tabKey}`);
+            if(activeBtn) {
+                activeBtn.classList.add('bg-amber-600', 'text-white', 'shadow');
+                activeBtn.classList.remove('text-gray-300');
+            }
+
+            renderCurrentSection();
+        }
+
+        // Render the currently active section
+        function renderCurrentSection() {
+            const section = menuData.sections[menuData.currentTab];
+
+            // Set Title
+            document.getElementById('section-title-input').value = section.title;
+
+            // Render Dish Items
+            renderDishes(section.items);
+
+            // Render 3 Image Slots
+            renderImages(section.images);
+
+            // Update edit mode styling visibility
+            applyEditModeVisibility();
+        }
+
+        // Render List of Dishes
+        function renderDishes(items) {
+            const container = document.getElementById('dishes-container');
+            container.innerHTML = '';
+
+            items.forEach((item, index) => {
+                const itemEl = document.createElement('div');
+                itemEl.className = 'group flex items-center justify-between space-x-2 py-1';
+
+                itemEl.innerHTML = `
+                    <div class="text-amber-300 text-lg select-none">❖</div>
+                    
+                    <!-- Dish Name Input -->
+                    <input type="text" value="${item.name}" 
+                        onchange="updateDishName(${item.id}, this.value)"
+                        class="editable-field font-menu-header text-xl sm:text-2xl font-bold uppercase tracking-wide text-white bg-transparent border-b border-transparent hover:border-amber-400 focus:border-amber-400 focus:bg-black/30 outline-none flex-grow min-w-0 transition px-1">
+                    
+                    <!-- Dotted Leader Line -->
+                    <div class="dotted-line"></div>
+                    
+                    <!-- Price Symbol and Price Input -->
+                    <div class="flex items-center space-x-1 font-menu-header text-xl sm:text-2xl font-bold text-amber-300 whitespace-nowrap">
+                        <span>S/.</span>
+                        <input type="text" value="${item.price}" 
+                            onchange="updateDishPrice(${item.id}, this.value)"
+                            class="editable-field w-16 text-right font-bold text-amber-300 bg-transparent border-b border-transparent hover:border-amber-400 focus:border-amber-400 focus:bg-black/30 outline-none transition px-1">
+                    </div>
+
+                    <!-- Delete Dish Button (Visible in edit mode) -->
+                    <button onclick="deleteDish(${item.id})" class="edit-control text-red-400 hover:text-red-300 hover:bg-red-900/40 p-1 rounded text-sm transition opacity-0 group-hover:opacity-100" title="Eliminar plato">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                `;
+
+                container.appendChild(itemEl);
+            });
+        }
+
+        // Dish Item Handlers
+        function updateDishName(id, value) {
+            const item = menuData.sections[menuData.currentTab].items.find(i => i.id === id);
+            if (item) item.name = value.toUpperCase();
+        }
+
+        function updateDishPrice(id, value) {
+            const item = menuData.sections[menuData.currentTab].items.find(i => i.id === id);
+            if (item) item.price = value;
+        }
+
+        function addNewDish() {
+            const currentItems = menuData.sections[menuData.currentTab].items;
+            const newId = Date.now();
+            currentItems.push({
+                id: newId,
+                name: "NUEVO PLATO DELICIOSO",
+                price: "15.0"
+            });
+            renderDishes(currentItems);
+            applyEditModeVisibility();
+        }
+
+        function deleteDish(id) {
+            const currentItems = menuData.sections[menuData.currentTab].items;
+            menuData.sections[menuData.currentTab].items = currentItems.filter(i => i.id !== id);
+            renderDishes(menuData.sections[menuData.currentTab].items);
+            applyEditModeVisibility();
+        }
+
+        // Render 3 Image Slots
+        function renderImages(imagesArray) {
+            const container = document.getElementById('images-container');
+            container.innerHTML = '';
+
+            for (let i = 0; i < 3; i++) {
+                const imgUrl = imagesArray[i] || 'https://placehold.co/400x260/3d1e07/f3ca52?text=Muestra+de+Plato';
+                
+                const imgCard = document.createElement('div');
+                imgCard.className = 'relative group rounded-xl overflow-hidden image-frame bg-black/40 h-32 sm:h-36 w-full';
+                
+                imgCard.innerHTML = `
+                    <img src="${imgUrl}" alt="Ejemplo de plato ${i+1}" class="w-full h-full object-cover">
+                    
+                    <!-- Overlay Change Image Button -->
+                    <label class="edit-control absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center cursor-pointer transition">
+                        <i class="fa-solid fa-cloud-arrow-up text-amber-300 text-2xl mb-1"></i>
+                        <span class="text-xs text-amber-200 font-semibold">Cambiar Foto ${i+1}</span>
+                        <input type="file" accept="image/*" class="hidden" onchange="handleImageUpload(event, ${i})">
+                    </label>
+                `;
+
+                container.appendChild(imgCard);
+            }
+        }
+
+        // Handle Image Upload for Slots
+        function handleImageUpload(event, index) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    menuData.sections[menuData.currentTab].images[index] = e.target.result;
+                    renderImages(menuData.sections[menuData.currentTab].images);
+                    applyEditModeVisibility();
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Handle Logo Upload
+        function handleLogoUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    menuData.restaurant.logo = e.target.result;
+                    document.getElementById('logo-preview').src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Toggle Edit Mode vs Presentation Mode
+        function toggleEditMode() {
+            menuData.isEditMode = !menuData.isEditMode;
+            
+            const toggleBtnText = document.getElementById('edit-toggle-text');
+            const toggleBtn = document.getElementById('edit-toggle-btn');
+
+            if (menuData.isEditMode) {
+                toggleBtnText.innerText = "Modo Edición: ACTIVADO";
+                toggleBtn.classList.replace('bg-gray-600', 'bg-blue-600');
+                toggleBtn.classList.replace('hover:bg-gray-700', 'hover:bg-blue-700');
+            } else {
+                toggleBtnText.innerText = "Modo Vista Previa";
+                toggleBtn.classList.replace('bg-blue-600', 'bg-gray-600');
+                toggleBtn.classList.replace('hover:bg-blue-700', 'hover:bg-gray-700');
+            }
+
+            applyEditModeVisibility();
+        }
+
+        // Hide or Show edit controls
+        function applyEditModeVisibility() {
+            const controls = document.querySelectorAll('.edit-control');
+            const editableInputs = document.querySelectorAll('.editable-field');
+
+            controls.forEach(ctrl => {
+                if (menuData.isEditMode) {
+                    ctrl.style.display = '';
+                } else {
+                    ctrl.style.display = 'none';
+                }
+            });
+
+            editableInputs.forEach(input => {
+                if (menuData.isEditMode) {
+                    input.removeAttribute('readonly');
+                    input.classList.add('hover:border-amber-400');
+                } else {
+                    input.setAttribute('readonly', 'true');
+                    input.classList.remove('hover:border-amber-400');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
