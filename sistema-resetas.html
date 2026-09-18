@@ -25,13 +25,6 @@
             background: radial-gradient(circle at center, #5c141d 0%, #380a10 70%, #200407 100%);
         }
 
-        /* Wooden Sign Aesthetic */
-        .wood-texture {
-            background: linear-gradient(180deg, #8B4513 0%, #5C2E0B 50%, #3D1E07 100%);
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.8), 0 8px 15px rgba(0,0,0,0.5);
-            border: 3px solid #d4af37;
-        }
-
         /* Ornate Gold Border Frame */
         .menu-border-frame {
             border: 3px solid #d4af37;
@@ -47,19 +40,6 @@
             margin: 0 8px;
             height: 1.2em;
             opacity: 0.8;
-        }
-
-        /* Golden Text Gradient Effects */
-        .text-gold-gradient {
-            background: linear-gradient(180deg, #FFF6BD 0%, #F3CA52 50%, #C70039 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
-        }
-
-        .text-gold-solid {
-            color: #F3CA52;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.9);
         }
 
         /* Frame for Food Images */
@@ -101,7 +81,7 @@
                 </div>
                 <div>
                     <h1 class="font-bold text-lg leading-tight text-amber-400">Editor de Menú Interactivo</h1>
-                    <p class="text-xs text-gray-400">Diseño inspirativo en pergamino borgoña</p>
+                    <p class="text-xs text-gray-400">Diseño limpio en pergamino borgoña</p>
                 </div>
             </div>
 
@@ -142,41 +122,22 @@
             <div class="absolute bottom-3 left-3 text-amber-400 text-3xl pointer-events-none opacity-80">❖</div>
             <div class="absolute bottom-3 right-3 text-amber-400 text-3xl pointer-events-none opacity-80">❖</div>
 
-            <!-- Header Section (Logo / Wooden Sign) -->
-            <div class="text-center mb-8 relative">
-                
-                <!-- Wooden Sign Box -->
-                <div class="wood-texture max-w-xl mx-auto rounded-2xl p-4 sm:p-6 text-center relative overflow-hidden group">
+            <!-- Header Section (Clean Direct Logo Display) -->
+            <div class="text-center mb-6 relative">
+                <div class="relative inline-block max-w-md w-full group">
+                    <!-- Clean Floating Logo Image (No background box) -->
+                    <img id="logo-preview" 
+                         src="https://placehold.co/400x150/transparent/f3ca52?text=%2B+AGREGAR+LOGO" 
+                         alt="Logo Restaurante" 
+                         class="max-h-52 w-auto max-w-full object-contain mx-auto filter drop-shadow-lg transition-transform hover:scale-[1.02] cursor-pointer">
                     
-                    <!-- Chain Hooks Effect -->
-                    <div class="absolute -top-1 left-1/4 w-3 h-4 bg-amber-700 rounded-b border border-yellow-900 shadow"></div>
-                    <div class="absolute -top-1 right-1/4 w-3 h-4 bg-amber-700 rounded-b border border-yellow-900 shadow"></div>
-
-                    <!-- Logo Upload / Display Slot -->
-                    <div class="mb-2 flex flex-col items-center justify-center">
-                        <div class="relative group/logo">
-                            <img id="logo-preview" src="https://placehold.co/120x120/5c2e0b/f3ca52?text=LOGO" alt="Logo Restaurante" class="w-20 h-20 object-cover rounded-full border-2 border-amber-400 shadow-md">
-                            
-                            <!-- Edit Button for Logo (Visible in edit mode) -->
-                            <label for="logo-input" class="edit-control absolute inset-0 bg-black/60 rounded-full flex items-center justify-center cursor-pointer opacity-0 group-hover/logo:opacity-100 transition">
-                                <i class="fa-solid fa-camera text-amber-300 text-lg"></i>
-                                <input type="file" id="logo-input" accept="image/*" class="hidden" onchange="handleLogoUpload(event)">
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- Editable Restaurant Name -->
-                    <div class="relative my-1">
-                        <span class="text-xs uppercase tracking-widest text-amber-200 block font-semibold">Restaurante</span>
-                        <input type="text" id="rest-name-input" value="La Esquina del Buen Sabor" 
-                            class="editable-field bg-transparent text-center font-title text-2xl sm:text-4xl font-black text-white w-full border-b border-transparent hover:border-amber-400 focus:border-amber-400 focus:bg-black/30 outline-none rounded px-2 transition">
-                    </div>
-
-                    <!-- Editable Tagline -->
-                    <div class="mt-2 inline-block bg-amber-950/80 px-4 py-1 rounded-full border border-amber-600/50">
-                        <input type="text" id="rest-tagline-input" value="Comida casera • Sabor auténtico" 
-                            class="editable-field bg-transparent text-center text-xs sm:text-sm font-medium text-amber-200 w-full border-b border-transparent hover:border-amber-400 focus:border-amber-400 outline-none rounded transition">
-                    </div>
+                    <!-- Upload Dropzone Overlay in Edit Mode -->
+                    <label for="logo-input" class="edit-control absolute inset-0 bg-black/60 backdrop-blur-xs rounded-2xl border-2 border-dashed border-amber-400 flex flex-col items-center justify-center cursor-pointer opacity-0 group-hover:opacity-100 transition p-4">
+                        <i class="fa-solid fa-cloud-arrow-up text-amber-300 text-3xl mb-2"></i>
+                        <span class="text-sm font-bold text-amber-200 uppercase tracking-wider">Cargar / Cambiar Logo</span>
+                        <span class="text-xs text-amber-300/80 mt-1">Sube una imagen PNG transparente</span>
+                        <input type="file" id="logo-input" accept="image/*" class="hidden" onchange="handleLogoUpload(event)">
+                    </label>
                 </div>
             </div>
 
@@ -235,9 +196,7 @@
         // Global State for all 3 Sections
         const menuData = {
             restaurant: {
-                name: "La Esquina del Buen Sabor",
-                tagline: "Comida casera • Sabor auténtico",
-                logo: "https://placehold.co/120x120/5c2e0b/f3ca52?text=LOGO",
+                logo: "https://placehold.co/400x150/transparent/f3ca52?text=%2B+AGREGAR+LOGO",
                 footerMsg: "¡Buen Provecho!"
             },
             currentTab: 'platos',
@@ -299,14 +258,7 @@
             renderCurrentSection();
         };
 
-        // Bind events for top restaurant fields
         function bindRestaurantHeaderEvents() {
-            document.getElementById('rest-name-input').addEventListener('input', (e) => {
-                menuData.restaurant.name = e.target.value;
-            });
-            document.getElementById('rest-tagline-input').addEventListener('input', (e) => {
-                menuData.restaurant.tagline = e.target.value;
-            });
             document.getElementById('section-title-input').addEventListener('input', (e) => {
                 menuData.sections[menuData.currentTab].title = e.target.value;
             });
@@ -333,7 +285,6 @@
             renderCurrentSection();
         }
 
-        // Render the currently active section
         function renderCurrentSection() {
             const section = menuData.sections[menuData.currentTab];
 
@@ -355,7 +306,7 @@
             const container = document.getElementById('dishes-container');
             container.innerHTML = '';
 
-            items.forEach((item, index) => {
+            items.forEach((item) => {
                 const itemEl = document.createElement('div');
                 itemEl.className = 'group flex items-center justify-between space-x-2 py-1';
 
@@ -418,7 +369,6 @@
             applyEditModeVisibility();
         }
 
-        // Render 3 Image Slots
         function renderImages(imagesArray) {
             const container = document.getElementById('images-container');
             container.innerHTML = '';
@@ -458,7 +408,6 @@
             }
         }
 
-        // Handle Logo Upload
         function handleLogoUpload(event) {
             const file = event.target.files[0];
             if (file) {
@@ -491,7 +440,6 @@
             applyEditModeVisibility();
         }
 
-        // Hide or Show edit controls
         function applyEditModeVisibility() {
             const controls = document.querySelectorAll('.edit-control');
             const editableInputs = document.querySelectorAll('.editable-field');
